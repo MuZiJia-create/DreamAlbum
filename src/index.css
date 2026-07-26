@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, "Microsoft YaHei", sans-serif;
+  color: rgba(255, 248, 248, 0.86);
+  background: #09050d;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+button, input { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+
+.album-app { position: relative; width: 100%; height: 100%; overflow: hidden; touch-action: none; background: #09050d; }
+.album-app canvas { display: block; }
+
+.hud { position: absolute; inset: 0; z-index: 3; pointer-events: none; user-select: none; }
+.hud-header { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: flex-start; justify-content: space-between; padding: 31px 8.1vw 0 2.45vw; }
+.brand-block { display: flex; align-items: flex-start; gap: 26px; }
+.close-button { pointer-events: auto; width: 42px; height: 42px; border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 50%; color: rgba(255,255,255,0.42) !important; }
+.brand-block h1 { margin: -2px 0 0; color: rgba(255,242,221,0.95); font: 600 27px/1 Georgia, "Times New Roman", serif; letter-spacing: 5px; text-shadow: 0 0 22px rgba(255,184,196,0.24); }
+.brand-block p { margin: 10px 0 0; color: rgba(255,238,231,0.48); font-size: 8px; letter-spacing: 2.55px; white-space: nowrap; }
+.stage-label { text-align: right; padding-top: 1px; }
+.stage-label p, .stage-label span { margin: 0; color: rgba(255,242,236,0.62); font-size: 9px; letter-spacing: 2.05px; }
+.stage-label span { display: block; margin-top: 9px; color: rgba(255,242,236,0.43); font-size: 10px; }
+
+.poem-wrap { position: absolute; left: 50%; top: 48%; width: min(560px, 68vw); min-height: 7.4em; transform: translate(-50%, -50%); text-align: center; }
+.poem-layer { position: absolute; inset: 0; display: grid; align-content: center; margin: 0; color: rgba(255,248,244,0.9); font: 400 clamp(22px, 2.1vw, 34px)/1.65 "Cinzel", "Playfair Display", "Noto Serif SC", Georgia, serif; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,192,203,0.8), 0 0 20px rgba(255,182,193,0.5), 0 0 40px rgba(230,230,250,0.3); transform-origin: center; }
+.poem-layer.is-entering { animation: poem-enter 800ms cubic-bezier(.2,.8,.2,1) both; }
+.poem-layer.is-leaving { animation: poem-exit 800ms cubic-bezier(.2,.8,.2,1) both; }
+.poem-wrap span { display: block; }
+
+.hud-footer { position: absolute; left: 2.45vw; right: 2.45vw; bottom: 27px; display: flex; align-items: flex-end; justify-content: space-between; color: rgba(255,247,244,0.47); }
+.media-control { display: flex; align-items: center; gap: 10px; pointer-events: auto; font-size: 11px; }
+.media-control > button:first-child { color: rgba(255,249,244,0.78); }
+.time { font-size: 9px; letter-spacing: 1px; white-space: nowrap; }
+.timeline { position: relative; width: min(16vw, 184px); height: 9px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.timeline::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; height: 1px; background: rgba(255,255,255,0.2); }
+.timeline span { position: absolute; top: 4px; left: 0; height: 1px; background: #f0a5bd; box-shadow: 0 0 8px rgba(255,121,168,0.8); }
+.gesture-hint { position: absolute; left: 50%; bottom: -3px; transform: translateX(-50%); margin: 0; color: rgba(255,246,243,0.34); font-size: 8px; letter-spacing: 1.35px; white-space: nowrap; }
+.hud-actions { display: flex; align-items: center; gap: 15px; pointer-events: auto; }
+.glow-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 29px; padding: 0 11px; border: 1px solid rgba(255,255,255,0.1); background: rgba(12,6,17,0.18); color: rgba(255,245,244,0.42); font-size: 8px; letter-spacing: 1.15px; cursor: pointer; }
+.glow-toggle.is-on { border-color: rgba(255,157,193,0.34); color: rgba(255,219,231,0.78); box-shadow: inset 0 0 14px rgba(255,91,147,0.06); }
+.max-button { color: rgba(255,255,255,0.45) !important; }
+.detail-overlay { position: fixed; inset: 0; z-index: 10; display: flex; justify-content: flex-end; background: rgba(4,1,8,0.42); backdrop-filter: blur(8px); animation: overlay-in 400ms ease; }
+.detail-panel { position: relative; width: min(390px, 88vw); height: 100%; padding: 13vh 42px 48px; background: rgba(15,7,18,0.82); border-left: 1px solid rgba(255,182,205,0.16); box-shadow: -16px 0 60px rgba(0,0,0,0.32); animation: panel-in 550ms cubic-bezier(.2,.8,.2,1); }
+.detail-close { position: absolute; top: 33px; right: 34px; width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,0.12); border-radius: 50%; background: transparent; color: rgba(255,255,255,0.62); cursor: pointer; }
+.detail-image { width: 100%; aspect-ratio: 0.78; overflow: hidden; border: 1px solid rgba(255,191,210,0.2); box-shadow: 0 12px 40px rgba(0,0,0,0.36), 0 0 25px rgba(255,81,151,0.08); }
+.detail-image img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.detail-kicker { margin: 25px 0 11px; color: rgba(255,215,227,0.45); font-size: 8px; letter-spacing: 1.55px; }
+.detail-panel h2 { margin: 0; color: rgba(255,245,243,0.91); font: 400 30px/1.2 Georgia, "Noto Serif SC", serif; letter-spacing: 2px; }
+.detail-rule { width: 42px; height: 1px; margin: 25px 0 20px; background: #f49ab6; box-shadow: 0 0 12px #f49ab6; }
+.detail-copy { max-width: 270px; margin: 0; color: rgba(255,241,239,0.6); font: 400 14px/2 "Noto Serif SC", Georgia, serif; }
+.detail-index { position: absolute; left: 42px; bottom: 42px; margin: 0; color: rgba(255,255,255,0.32); font-size: 9px; letter-spacing: 2px; }
+@keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes panel-in { from { transform: translateX(28px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+@keyframes poem-enter { from { opacity: 0; filter: blur(12px); transform: scale(0.92); } to { opacity: 1; filter: blur(0); transform: scale(1); } }
+@keyframes poem-exit { from { opacity: 1; filter: blur(0); transform: scale(1); } to { opacity: 0; filter: blur(12px); transform: scale(1.1); } }
+
+@media (max-width: 700px) {
+  .hud-header { padding: 20px 20px 0; }
+  .brand-block { gap: 12px; }
+  .close-button { width: 34px; height: 34px; }
+  .brand-block h1 { font-size: 22px; letter-spacing: 3px; }
+  .brand-block p { font-size: 6px; letter-spacing: 1.4px; }
+  .stage-label p { max-width: 160px; font-size: 7px; letter-spacing: 1px; }
+  .hud-footer { left: 20px; right: 20px; bottom: 19px; }
+  .gesture-hint { display: none; }
+  .timeline { width: 70px; }
+  .time { display: none; }
+  .glow-toggle { padding: 0 7px; font-size: 7px; }
+  .poem-wrap { top: 44%; width: 86vw; }
+  .detail-panel { padding: 96px 25px 40px; }
+  .detail-close { top: 25px; right: 25px; }
+  .detail-index { left: 25px; bottom: 28px; }
+}

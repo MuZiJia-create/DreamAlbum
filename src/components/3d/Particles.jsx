@@ -1,61 +1,72 @@
-import { useFrame, useLoader } from "@react-three/fiber"
+import { useFrame } from "@react-three/fiber"
 import { useMemo, useRef } from "react"
 import * as THREE from "three"
 
-const PARTICLE_COUNT = 96
-const PASTEL_COLORS = ["#ffd1dc", "#fbe7c6", "#c7ceea", "#f4c2e7"]
-const SAKURA_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><defs><radialGradient id="p" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#fff" stop-opacity=".96"/><stop offset=".48" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><filter id="s"><feGaussianBlur stdDeviation=".7"/></filter></defs><g filter="url(#s)" fill="url(#p)"><path d="M80 78C51 28 17 28 19 55c2 25 29 34 57 26Z"/><path d="M82 78c50-28 76-5 62 19-13 21-39 12-62-12Z"/><path d="M82 80c24 50-4 76-27 61-20-13-10-39 21-61Z"/><path d="M79 81c-48 29-75 4-61-20 13-21 39-10 61 12Z"/><path d="M79 79c-17-54 14-74 35-53 18 17 2 40-32 53Z"/><circle cx="80" cy="80" r="12" fill="#fff" fill-opacity=".84"/></g></svg>`
-const SAKURA_TEXTURE_URI = `data:image/svg+xml;base64,${btoa(SAKURA_SVG)}`
+const FEATHER_SVG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBkPSJNNTAgNSBDIDY1IDI1LCA3NSA1MCwgNTAgOTUgQyA0NSA3MCwgMzAgNDAsIDUwIDUgWiIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuODUiLz48cGF0aCBkPSJNNTAgNSBRIDUyIDUwIDUwIDk1IiBzdHJva2U9InJnYmEoMjU1LDI1NSwyNTUsMC41KSIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48L3N2Zz4="
 
-const randomBetween = (minimum, maximum) => minimum + Math.random() * (maximum - minimum)
+export default function Particles() {
+  const count = 90
+  const meshRef = useRef(null)
+  const texture = useMemo(() => {
+    const loadedTexture = new THREE.TextureLoader().load(FEATHER_SVG)
+    loadedTexture.colorSpace = THREE.SRGBColorSpace
+    loadedTexture.minFilter = THREE.LinearFilter
+    loadedTexture.magFilter = THREE.LinearFilter
+    loadedTexture.wrapS = THREE.ClampToEdgeWrapping
+    loadedTexture.wrapT = THREE.ClampToEdgeWrapping
+    loadedTexture.needsUpdate = true
+    return loadedTexture
+  }, [])
 
-function SakuraParticle({ index, texture }) {
-  const meshRef = useRef()
-  const materialRef = useRef()
-  const data = useMemo(() => ({
-    x: randomBetween(-12, 12),
-    y: randomBetween(-10, 12),
-    z: randomBetween(-5, 1.5),
-    scale: randomBetween(0.28, 0.58),
-    speed: randomBetween(0.003, 0.009),
-    phase: randomBetween(0, Math.PI * 2),
-    color: PASTEL_COLORS[index % PASTEL_COLORS.length],
-  }), [index])
+  const particles = useMemo(() => {
+    const values = []
+    for (let index = 0; index < count; index += 1) {
+      values.push({
+        x: (Math.random() - 0.5) * 18,
+        y: (Math.random() - 0.5) * 14,
+        z: (Math.random() - 0.5) * 10 - 2,
+        speedY: 0.005 + Math.random() * 0.008,
+        swaySpeed: 0.5 + Math.random() * 1.5,
+        rotSpeed: (Math.random() - 0.5) * 0.02,
+        scale: 0.15 + Math.random() * 0.25,
+        color: new THREE.Color().setHSL(0.9 + Math.random() * 0.15, 0.8, 0.85),
+      })
+    }
+    return values
+  }, [count])
 
-  useFrame((state, delta) => {
+  const dummy = useMemo(() => new THREE.Object3D(), [])
+
+  useFrame((state) => {
     const mesh = meshRef.current
     if (!mesh) return
-    const time = state.clock.elapsedTime
-    mesh.position.y -= data.speed * delta * 60
-    mesh.position.x += Math.sin(time + index) * 0.01 * delta * 60
-    mesh.position.z += Math.sin(time * 0.5 + data.phase) * 0.0015 * delta * 60
-    mesh.rotation.z += Math.sin(time * 0.6 + index) * 0.004 * delta * 60
-    mesh.rotation.x = Math.sin(time * 0.35 + data.phase) * 0.18
-    if (materialRef.current) materialRef.current.opacity = 0.32 + Math.sin(time * 0.9 + data.phase) * 0.1
-    if (mesh.position.y < -11) mesh.position.set(randomBetween(-12, 12), 12 + Math.random() * 3, randomBetween(-5, 1.5))
+    const time = state.clock.getElapsedTime()
+
+    particles.forEach((particle, index) => {
+      particle.y -= particle.speedY
+      particle.x += Math.sin(time * particle.swaySpeed + index) * 0.006
+      if (particle.y < -7) particle.y = 7
+
+      dummy.position.set(particle.x, particle.y, particle.z)
+      dummy.rotation.set(
+        Math.sin(time * 0.5 + index) * 0.5,
+        Math.cos(time * 0.3 + index) * 0.5,
+        time * particle.rotSpeed,
+      )
+      dummy.scale.setScalar(particle.scale)
+      dummy.updateMatrix()
+      mesh.setMatrixAt(index, dummy.matrix)
+      mesh.setColorAt(index, particle.color)
+    })
+
+    mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
   })
 
   return (
-    <mesh ref={meshRef} position={[data.x, data.y, data.z]} scale={data.scale} rotation={[0, 0, data.phase]} renderOrder={0}>
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]} renderOrder={0}>
       <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial ref={materialRef} map={texture} color={data.color} transparent opacity={0.38} depthWrite={false} depthTest blending={THREE.AdditiveBlending} side={THREE.DoubleSide} toneMapped={false} />
-    </mesh>
-  )
-}
-
-export default function Particles() {
-  const sakuraTexture = useLoader(THREE.TextureLoader, SAKURA_TEXTURE_URI)
-  const texture = useMemo(() => {
-    sakuraTexture.colorSpace = THREE.SRGBColorSpace
-    sakuraTexture.minFilter = THREE.LinearFilter
-    sakuraTexture.magFilter = THREE.LinearFilter
-    sakuraTexture.needsUpdate = true
-    return sakuraTexture
-  }, [sakuraTexture])
-
-  return (
-    <group renderOrder={0}>
-      {Array.from({ length: PARTICLE_COUNT }, (_, index) => <SakuraParticle key={index} index={index} texture={texture} />)}
-    </group>
+      <meshBasicMaterial map={texture} transparent depthWrite={false} blending={THREE.AdditiveBlending} side={THREE.DoubleSide} toneMapped={false} />
+    </instancedMesh>
   )
 }

@@ -1,6 +1,6 @@
 import { Maximize2, Pause, Play, Volume2, X } from "lucide-react"
-import { AnimatePresence, motion } from "framer-motion"
 import { useMemo, useState } from "react"
+import PoeticText from "./PoeticText"
 
 const stages = [
   { at: 0, name: "ARRIVAL", chinese: "\u82b1\u57df\u521d\u89c1", poem: ["\u8f7b\u89e6\uff0c\u5e8f\u7ae0\u7531\u6b64\u5f00\u59cb"] },
@@ -13,25 +13,6 @@ const stages = [
 
 const findStage = (progress) => [...stages].reverse().find((stage) => progress >= stage.at) ?? stages[0]
 const controlStyle = { border: 0, background: "transparent", color: "inherit", cursor: "pointer", display: "grid", placeItems: "center" }
-
-function PoemOverlay({ stage }) {
-  return (
-    <div className="poem-wrap">
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.p
-          key={stage.name}
-          className="poem-layer"
-          initial={{ opacity: 0, filter: "blur(12px)", scale: 0.95 }}
-          animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-          exit={{ opacity: 0, filter: "blur(15px)", scale: 1.08 }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {stage.poem.map((line) => <span key={line}>{line}</span>)}
-        </motion.p>
-      </AnimatePresence>
-    </div>
-  )
-}
 
 export default function HUD({ progress = 0, onProgressChange }) {
   const [isPlaying, setIsPlaying] = useState(false)
@@ -47,7 +28,7 @@ export default function HUD({ progress = 0, onProgressChange }) {
         </div>
         <div className="stage-label"><p>VALLEY: {stage.name} / {stage.chinese}</p><span>{percent}%</span></div>
       </header>
-      <PoemOverlay stage={stage} />
+      <PoeticText text={stage.poem.join("\n")} />
       <footer className="hud-footer">
         <div className="media-control">
           <button style={controlStyle} onClick={() => setIsPlaying((playing) => !playing)} aria-label={isPlaying ? "\u6682\u505c" : "\u64ad\u653e"}>{isPlaying ? <Pause size={15} fill="currentColor" /> : <Play size={15} fill="currentColor" />}</button>

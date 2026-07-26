@@ -85,9 +85,7 @@ export default function Card({ index, image, transform, isFocused, onClick }) {
     groupRef.current.rotation.y = lerp(groupRef.current.rotation.y, transform.rotation[1], rotationEase)
     groupRef.current.rotation.z = lerp(groupRef.current.rotation.z, transform.rotation[2], rotationEase)
     groupRef.current.scale.setScalar(lerp(groupRef.current.scale.x, baseScale, motionEase))
-    const baseRenderOrder = isActive
-      ? 9999
-      : Math.floor(1000 + groupRef.current.position.z * 10)
+    const baseRenderOrder = isActive ? 9999 : index
     groupRef.current.renderOrder = baseRenderOrder
 
     groupRef.current.children.forEach((child, layerIndex) => {
@@ -101,7 +99,7 @@ export default function Card({ index, image, transform, isFocused, onClick }) {
       position={transform.position}
       rotation={transform.rotation}
       scale={transform.scale}
-      renderOrder={isFocused ? 9999 : Math.floor(1000 + transform.position[2] * 10)}
+      renderOrder={isFocused ? 9999 : index}
       onPointerEnter={(event) => {
         event.stopPropagation()
         setHovered(true)

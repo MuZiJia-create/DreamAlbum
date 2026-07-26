@@ -18,28 +18,29 @@ const transform = (a, b, t) => ({
 })
 
 function crossTransform(index, total) {
-  if (index === 0) return { position: [0, 0, 0], rotation: [0, 0, 0], scale: 1.24 }
+  if (index === 0) return { position: [0, 0, 1.05], rotation: [0, 0, 0], scale: 1.24 }
 
   const arm = (index - 1) % 4
   const layer = Math.floor((index - 1) / 4) + 1
   const spacing = total <= 5 ? 1.62 : 1.1
   const distance = layer * spacing
-  const tilt = 0.04 + layer * 0.012
+  const depth = -layer * 0.56
+  const tilt = 0.22 + layer * 0.035
 
-  if (arm === 0) return { position: [distance, 0, 0], rotation: [0, 0, -tilt], scale: 0.82 }
-  if (arm === 1) return { position: [-distance, 0, 0], rotation: [0, 0, tilt], scale: 0.82 }
-  if (arm === 2) return { position: [0, distance * 0.78, 0], rotation: [0, 0, 0], scale: 0.8 }
-  return { position: [0, -distance * 0.78, 0], rotation: [0, 0, 0], scale: 0.8 }
+  if (arm === 0) return { position: [distance, 0, depth], rotation: [0, -tilt, 0], scale: 0.82 }
+  if (arm === 1) return { position: [-distance, 0, depth], rotation: [0, tilt, 0], scale: 0.82 }
+  if (arm === 2) return { position: [0, distance * 0.78, depth + 0.2], rotation: [-tilt, 0, 0], scale: 0.8 }
+  return { position: [0, -distance * 0.78, depth + 0.2], rotation: [tilt, 0, 0], scale: 0.8 }
 }
 
 function heroTransform(index, total) {
-  if (index === 0) return { position: [0, -0.02, 0], rotation: [0, 0, 0], scale: total <= 5 ? 1.58 : 1.45 }
+  if (index === 0) return { position: [0, -0.02, 1.34], rotation: [0, 0, 0], scale: total <= 5 ? 1.58 : 1.45 }
   const amount = Math.max(total - 1, 1)
   const angle = Math.PI * 0.18 + (index - 1) / amount * Math.PI * 1.64
   const radius = total <= 5 ? 2.92 : 3.25
   return {
-    position: [Math.cos(angle) * radius, Math.sin(angle) * radius * 0.73, 0],
-    rotation: [0, 0, angle - Math.PI / 2],
+    position: [Math.cos(angle) * radius, Math.sin(angle) * radius * 0.73, -0.6 - Math.abs(Math.cos(angle)) * 0.7],
+    rotation: [Math.sin(angle) * 0.2, -Math.cos(angle) * 0.44, Math.sin(angle) * 0.08],
     scale: total <= 5 ? 0.8 : 0.66,
   }
 }
@@ -48,8 +49,8 @@ function wreathTransform(index, total) {
   const angle = Math.PI / 2 + index / Math.max(total, 1) * Math.PI * 2
   const radius = total <= 5 ? 2.68 : 3.22
   return {
-    position: [Math.cos(angle) * radius, Math.sin(angle) * radius * 0.78, 0],
-    rotation: [0, 0, angle],
+    position: [Math.cos(angle) * radius, Math.sin(angle) * radius * 0.78, -0.8 + Math.sin(angle * 2) * 0.45],
+    rotation: [Math.sin(angle) * 0.28, -Math.cos(angle) * 0.38, Math.sin(angle) * 0.17],
     scale: total <= 5 ? 0.98 : 0.73,
   }
 }
@@ -59,8 +60,8 @@ function waveTransform(index, total) {
   const x = normalized * (total <= 5 ? 7.3 : Math.min(total, 18) * 0.67)
   const wave = Math.sin(normalized * Math.PI * 1.25)
   return {
-    position: [x, wave * 0.88 - 0.12, 0],
-    rotation: [0, 0, -wave * 0.18],
+    position: [x, wave * 0.88 - 0.12, -Math.abs(normalized) * 1.9 + wave * 0.25],
+    rotation: [0.04, -normalized * 0.98, -wave * 0.18],
     scale: total <= 5 ? 1.02 : 0.78,
   }
 }
@@ -73,8 +74,8 @@ function gridTransform(index, total) {
   const centeredX = column - (columns - 1) / 2
   const centeredY = row - (rows - 1) / 2
   return {
-    position: [centeredX * 1.55, -centeredY * 1.84, 0],
-    rotation: [0, 0, centeredX * 0.025],
+    position: [centeredX * 1.55, -centeredY * 1.84, -Math.abs(centeredX) * 0.18 - row * 0.08],
+    rotation: [0, -centeredX * 0.075, 0],
     scale: total <= 5 ? 1.16 : 0.82,
   }
 }
@@ -111,15 +112,18 @@ function getTransform(index, total, progress, seed) {
   const segment = phase === -1 ? PHASES.length - 2 : phase
   const local = smooth((progress - PHASES[segment]) / (PHASES[segment + 1] - PHASES[segment]))
   const result = transform(layouts[segment], layouts[segment + 1], local)
+  const transitionArc = Math.sin(local * Math.PI)
   const rotationDirection = index % 2 === 0 ? 1 : -1
+  const transitionDepthStep = Math.min(0.38, 7.2 / Math.max(total - 1, 1))
+  const transitionDepth = (index - (total - 1) / 2) * transitionArc * transitionDepthStep
   const transitionTurn = (segment + local) * Math.PI * 2 * rotationDirection
   return {
     ...result,
-    position: [result.position[0], result.position[1], -0.3 + index * 0.05],
+    position: [result.position[0], result.position[1], result.position[2] + index * 0.08 + transitionDepth],
     rotation: [
-      Math.sin(index * 0.1) * 0.1,
-      transitionTurn,
-      result.rotation[2],
+      result.rotation[0],
+      result.rotation[1],
+      result.rotation[2] + transitionTurn,
     ],
   }
 }

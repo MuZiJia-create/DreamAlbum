@@ -28,8 +28,6 @@ button { -webkit-tap-highlight-color: transparent; }
 
 .poem-wrap { position: absolute; left: 50%; top: 48%; width: min(560px, 68vw); min-height: 7.4em; transform: translate(-50%, -50%); text-align: center; }
 .poem-layer { position: absolute; inset: 0; display: grid; align-content: center; margin: 0; color: rgba(255,248,244,0.9); font: 400 clamp(22px, 2.1vw, 34px)/1.65 "Cinzel", "Playfair Display", "Noto Serif SC", Georgia, serif; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,192,203,0.8), 0 0 20px rgba(255,182,193,0.5), 0 0 40px rgba(230,230,250,0.3); transform-origin: center; }
-.poem-layer.is-entering { animation: poem-enter 800ms cubic-bezier(.2,.8,.2,1) both; }
-.poem-layer.is-leaving { animation: poem-exit 800ms cubic-bezier(.2,.8,.2,1) both; }
 .poem-wrap span { display: block; }
 
 .hud-footer { position: absolute; left: 2.45vw; right: 2.45vw; bottom: 27px; display: flex; align-items: flex-end; justify-content: space-between; color: rgba(255,247,244,0.47); }
@@ -57,8 +55,6 @@ button { -webkit-tap-highlight-color: transparent; }
 @keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes panel-in { from { transform: translateX(28px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-@keyframes poem-enter { from { opacity: 0; filter: blur(12px); transform: scale(0.92); } to { opacity: 1; filter: blur(0); transform: scale(1); } }
-@keyframes poem-exit { from { opacity: 1; filter: blur(0); transform: scale(1); } to { opacity: 0; filter: blur(12px); transform: scale(1.1); } }
 
 @media (max-width: 700px) {
   .hud-header { padding: 20px 20px 0; }

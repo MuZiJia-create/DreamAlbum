@@ -1,7 +1,6 @@
 import { useMemo, useRef } from "react"
 import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing"
 import Card from "./Card"
-import Particles from "./Particles"
 
 const PHASES = [0, 0.12, 0.32, 0.52, 0.72, 0.86, 1]
 
@@ -181,9 +180,7 @@ export default function Scene({ images = [], progress = 0, focusedIndex = null, 
 
   return (
     <>
-      <color attach="background" args={["#09050d"]} />
       <fog attach="fog" args={["#09050d", 9, 22]} />
-      <Particles />
       <group>
         <BackgroundDragSurface progress={progress} onProgressChange={onProgressChange} />
         <ambientLight color="#ffffff" intensity={2.5} />

@@ -14,7 +14,9 @@ button, input { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
 
 .album-app { position: relative; width: 100%; height: 100%; overflow: hidden; touch-action: none; background: #09050d; }
-.album-app canvas { display: block; }
+.floating-lines-container { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: #09050d; }
+.floating-lines-container canvas { display: block; width: 100%; height: 100%; }
+.album-canvas { position: absolute !important; inset: 0; z-index: 1; display: block; background: transparent; }
 
 .hud { position: absolute; inset: 0; z-index: 3; pointer-events: none; user-select: none; }
 .hud-header { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: flex-start; justify-content: space-between; padding: 31px 8.1vw 0 2.45vw; }

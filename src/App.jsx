@@ -4,6 +4,7 @@ import * as THREE from "three"
 import Scene from "./components/3d/Scene"
 import HUD from "./components/ui/HUD"
 import Modal from "./components/ui/Modal"
+import FloatingLines from "./components/ui/FloatingLines"
 
 const pictureModules = import.meta.glob("../pictures/*.{png,jpg,jpeg,webp}", {
   eager: true,
@@ -11,6 +12,10 @@ const pictureModules = import.meta.glob("../pictures/*.{png,jpg,jpeg,webp}", {
   import: "default",
 })
 const subtitleCycle = ["FIRST LIGHT", "CROSSING", "VIOLET", "BLOSSOM", "ETERNAL", "MOON DUST"]
+const floatingLineGradient = ["#ffd1dc", "#c7ceea", "#fbe7c6"]
+const floatingLineWaves = ["top", "middle", "bottom"]
+const floatingLineCount = [7, 8, 6]
+const floatingLineDistance = [4, 5, 6]
 const images = Object.entries(pictureModules)
   .sort(([left], [right]) => left.localeCompare(right, "zh-CN"))
   .map(([path], index) => ({
@@ -54,12 +59,22 @@ export default function App() {
       className="album-app"
       onWheel={handleWheel}
     >
+      <FloatingLines
+        linesGradient={floatingLineGradient}
+        enabledWaves={floatingLineWaves}
+        lineCount={floatingLineCount}
+        lineDistance={floatingLineDistance}
+        animationSpeed={0.72}
+        bendRadius={4.6}
+        bendStrength={-0.38}
+      />
       <Canvas
+        className="album-canvas"
         camera={{ position: [0, 0, 8.8], fov: 42 }}
         dpr={[1, 1.7]}
         gl={{
           antialias: true,
-          alpha: false,
+          alpha: true,
           powerPreference: "high-performance",
           toneMapping: THREE.NoToneMapping,
         }}
